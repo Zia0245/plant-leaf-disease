@@ -1,0 +1,794 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leaf Doctor: plant disease detector</title>
+<script>
+(function(){var m="system";try{m=localStorage.getItem("ld-theme")||"system"}catch(e){}
+var dark=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches;
+document.documentElement.dataset.theme=m==="system"?(dark?"dark":"light"):m;})();
+</script>
+<style>
+:root{
+  --bg:#0a111f; --side:#0d1526; --card:#111a2c; --card2:#0e1627; --line:#1f2c45;
+  --ink:#eaf0ff; --muted:#8a9bb8; --accent:#2f6bd9; --accent-hi:#3c7bf0;
+  --ok:#4ade9a; --ok-bg:rgba(52,211,153,.12); --warn:#f5a35a; --warn-bg:rgba(245,163,90,.12);
+  --unsure:#a8b4cc; --unsure-bg:rgba(168,180,204,.12);
+  --line-hi:#34476b; --press-ink:#cfe0ff; --press-bg:rgba(60,123,240,.14);
+}
+:root[data-theme="light"]{
+  --bg:#f2f5fa; --side:#ffffff; --card:#ffffff; --card2:#f6f8fc; --line:#dbe3ef;
+  --ink:#0f1a2e; --muted:#58698a; --accent:#2f6bd9; --accent-hi:#2563d0;
+  --ok:#15803d; --ok-bg:rgba(22,163,74,.12); --warn:#b45309; --warn-bg:rgba(217,119,6,.13);
+  --unsure:#58698a; --unsure-bg:rgba(88,105,138,.12);
+  --line-hi:#b7c4da; --press-ink:#1d4fb8; --press-bg:rgba(47,107,217,.1);
+}
+*{box-sizing:border-box}
+html{color-scheme:dark}
+:root[data-theme="light"]{color-scheme:light}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button{font:inherit;color:inherit}
+.hidden{display:none!important}
+.sr{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.label{font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+.app{display:grid;grid-template-columns:268px minmax(0,1fr);min-height:100vh}
+
+/* sidebar */
+aside{background:var(--side);border-right:1px solid var(--line);padding:22px 16px;display:flex;flex-direction:column;gap:16px}
+.brand{display:flex;align-items:center;gap:12px;padding:0 4px}
+.brand svg{width:34px;height:34px;color:var(--ok);flex:none}
+.brand b{display:block;font-size:1.15rem;line-height:1.2}
+.brand span{font-size:.7rem;font-weight:600;letter-spacing:.08em;color:var(--muted)}
+.scope{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.scope b{display:block;margin:2px 0 6px}
+.scope .crops{display:flex;flex-wrap:wrap;gap:6px}
+.crop{font-size:.8rem;padding:2px 10px;border-radius:99px;background:var(--ok-bg);color:var(--ok)}
+.scope small{display:block;margin-top:8px;color:var(--muted);font-size:.78rem;line-height:1.4}
+nav{display:flex;flex-direction:column;gap:4px}
+nav button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:11px 14px;border:0;border-radius:12px;background:transparent;color:var(--ink);cursor:pointer;font-weight:500}
+nav button svg{width:20px;height:20px;flex:none;color:var(--muted)}
+nav button:hover{background:var(--card)}
+nav button.on{background:var(--card);box-shadow:inset 0 0 0 1px var(--line)}
+nav button.on svg{color:var(--accent-hi)}
+.side-foot{margin-top:auto;padding:12px 6px 0;border-top:1px solid var(--line);color:var(--muted);font-size:.78rem;line-height:1.45}
+.side-foot b{color:var(--ink);font-weight:600}
+
+/* main */
+main{min-width:0;display:flex;flex-direction:column}
+.top{display:flex;align-items:center;gap:14px;padding:20px 26px 14px;border-bottom:1px solid var(--line)}
+.top h1{margin:0;font-size:1.5rem;line-height:1.2;letter-spacing:-.01em}
+.top .sub{color:var(--muted);font-size:.84rem}
+.banner{margin:16px 26px 0;padding:10px 14px;border-radius:12px;background:var(--warn-bg);color:var(--warn);font-size:.9rem;display:flex;gap:10px;align-items:flex-start}
+.banner svg{width:18px;height:18px;flex:none;margin-top:2px}
+.content{padding:16px 26px 26px;flex:1;display:flex;flex-direction:column}
+
+/* pick */
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:420px;border:2px dashed var(--line);border-radius:18px;background:var(--card2);text-align:center;padding:30px 20px;cursor:pointer;transition:border-color .15s,background .15s}
+.drop:hover,.drop.over,.drop:focus-within{border-color:var(--accent-hi);background:var(--card)}
+.drop svg{width:44px;height:44px;color:var(--accent-hi);margin-bottom:6px}
+.drop b{font-size:1.1rem}
+.drop span{color:var(--muted);font-size:.92rem}
+.drop em{margin-top:10px;font-style:normal;font-size:.84rem;color:var(--ok);background:var(--ok-bg);padding:3px 12px;border-radius:99px}
+.hint{margin:12px 2px 0;color:var(--muted);font-size:.86rem}
+.notice{margin:12px 0 0;padding:10px 14px;border-radius:12px;background:var(--warn-bg);color:var(--warn);font-size:.9rem}
+
+/* busy / error */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px}
+.busy{padding:18px;display:flex;gap:18px;align-items:center}
+.busy img{width:110px;height:110px;object-fit:cover;border-radius:12px;background:var(--line);flex:none}
+.busy .row{display:flex;gap:12px;align-items:center}
+.busy p{margin:4px 0 0;color:var(--muted)}
+.spin{width:22px;height:22px;border:3px solid var(--line);border-top-color:var(--accent-hi);border-radius:50%;animation:s .8s linear infinite;flex:none}
+@keyframes s{to{transform:rotate(360deg)}}
+.err{padding:22px}
+.err p{margin:0 0 14px}
+
+/* result layout */
+.result{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(320px,1fr);gap:18px;align-items:start}
+.viewer{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.vbar{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.vbar .grow{flex:1}
+.chip-btn{display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border:1px solid var(--line);border-radius:10px;background:var(--card2);cursor:pointer;font-weight:500;font-size:.9rem}
+.chip-btn svg{width:17px;height:17px}
+.chip-btn:hover{border-color:var(--line-hi)}
+.chip-btn[aria-pressed=true]{border-color:var(--accent-hi);color:var(--press-ink);background:var(--press-bg)}
+.icon-btn{width:36px;height:36px;display:inline-grid;place-items:center;border:1px solid var(--line);border-radius:10px;background:var(--card2);cursor:pointer}
+.icon-btn svg{width:18px;height:18px}
+.icon-btn:hover{border-color:var(--line-hi)}
+.stage{height:min(62vh,540px);min-height:300px;overflow:auto;background:#05080f;position:relative}
+.stage .inner{position:relative;width:calc(var(--z,1)*100%);height:calc(var(--z,1)*100%)}
+.panes{position:absolute;inset:0;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:2px}
+.pane{position:relative;overflow:hidden;background:#05080f}
+.pane img,.pane canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.ptag{position:absolute;top:10px;left:10px;padding:3px 10px;border-radius:8px;background:rgba(5,8,15,.78);color:#eaf0ff;border:1px solid rgba(255,255,255,.14);font-size:.78rem;font-weight:600;pointer-events:none}
+.viewer:fullscreen{display:flex;flex-direction:column;border-radius:0}
+.viewer:fullscreen .stage{flex:1;height:auto}
+.opwrap{display:inline-flex;align-items:center;gap:8px}
+.opwrap b{min-width:42px;text-align:center;padding:4px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card2);color:var(--ink);font-variant-numeric:tabular-nums}
+.vfoot{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--line);font-size:.86rem;color:var(--muted);flex-wrap:wrap}
+.vfoot .grow{flex:1}
+.vfoot input[type=range]{width:110px;accent-color:var(--accent-hi)}
+.zoomtxt{min-width:46px;text-align:center;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.legend{display:flex;align-items:center;gap:8px}
+.legend i{display:block;width:44px;height:8px;border-radius:99px;background:linear-gradient(90deg,#2a4bd7,#22c1a0,#f2e24a,#ef3b2c)}
+
+/* findings panel */
+.side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:99px;font-size:.84rem;font-weight:600}
+.chip.ok{background:var(--ok-bg);color:var(--ok)}
+.chip.warn{background:var(--warn-bg);color:var(--warn)}
+.chip.unsure{background:var(--unsure-bg);color:var(--unsure)}
+.chip.plain{background:var(--card);border:1px solid var(--line);color:var(--ink);font-weight:500}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.card h2{margin:0 0 2px;font-size:1.35rem;line-height:1.25;letter-spacing:-.01em}
+.card .kind{color:var(--muted);font-size:.84rem}
+.card p{margin:10px 0 0}
+.meter{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:.86rem;color:var(--muted)}
+.meter .track{flex:1;height:8px;border-radius:99px;background:rgba(138,155,184,.2);overflow:hidden}
+.meter .track i{display:block;height:100%;border-radius:99px;background:var(--accent-hi)}
+.meter.ok .track i{background:var(--ok)} .meter.warn .track i{background:var(--warn)} .meter.unsure .track i{background:var(--unsure)}
+.meter b{color:var(--ink)}
+.top3{margin-top:12px}
+.top3 .row{display:grid;grid-template-columns:minmax(110px,38%) 1fr 50px;gap:10px;align-items:center;font-size:.86rem;padding:3px 0}
+.top3 .bar{height:6px;border-radius:99px;background:rgba(138,155,184,.2);overflow:hidden}
+.top3 .bar i{display:block;height:100%;background:var(--accent-hi);border-radius:99px}
+.top3 .pc{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+.top3 .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.reco .head{font-weight:700;font-size:1.05rem}
+.reco .line{display:flex;gap:10px;margin-top:10px;align-items:flex-start}
+.reco .line svg{width:20px;height:20px;flex:none;margin-top:2px;color:var(--accent-hi)}
+.reco .cure{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--unsure-bg)}
+.reco .cure b{display:block;font-size:.8rem;margin-bottom:2px;color:var(--muted)}
+.reco .cure p{margin:0}
+details.sec{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0 16px}
+details.sec summary{cursor:pointer;padding:13px 0;font-weight:600;list-style:none;display:flex;justify-content:space-between}
+details.sec summary::-webkit-details-marker{display:none}
+details.sec summary::after{content:"+";color:var(--muted);font-weight:400}
+details.sec[open] summary::after{content:"\2212"}
+details.sec ul{margin:0 0 14px;padding-left:20px}
+details.sec li{margin:4px 0}
+details.sec a{color:var(--accent-hi)}
+.actions{position:sticky;bottom:0;display:grid;grid-template-columns:1fr 1.3fr;gap:10px;padding:12px 0 0;background:linear-gradient(transparent,var(--bg) 24%)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 16px;border-radius:12px;border:1px solid var(--line);background:var(--card);cursor:pointer;font-weight:600}
+.btn svg{width:18px;height:18px}
+.btn:hover{border-color:var(--line-hi)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-hi)}
+.foot{margin-top:22px;color:var(--muted);font-size:.78rem;line-height:1.5}
+.ribbon{position:fixed;bottom:10px;left:10px;background:var(--warn-bg);color:var(--warn);padding:3px 10px;border-radius:99px;font-size:.75rem;font-weight:600;z-index:5}
+
+/* theme switch */
+.seg{margin-left:auto;display:inline-flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:12px;background:var(--card2);flex:none}
+.seg button{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:0;border-radius:9px;background:transparent;color:var(--muted);cursor:pointer;font-size:.84rem;font-weight:500}
+.seg button svg{width:16px;height:16px}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed=true]{background:var(--card);color:var(--ink);box-shadow:0 0 0 1px var(--line)}
+
+/* supported dialog */
+dialog{border:1px solid var(--line);border-radius:16px;background:var(--card);color:var(--ink);padding:0;max-width:560px;width:calc(100% - 28px)}
+dialog::backdrop{background:rgba(3,6,12,.7)}
+dialog .dh{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line)}
+dialog .dh b{font-size:1.1rem}
+dialog .db{padding:6px 18px 18px;max-height:70vh;overflow:auto}
+dialog h3{margin:16px 0 6px;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+dialog ul{margin:0;padding-left:20px}
+dialog li{margin:3px 0}
+
+@media (max-width:980px){
+  .app{grid-template-columns:1fr}
+  aside{flex-direction:row;align-items:center;flex-wrap:wrap;padding:12px 16px;gap:10px;border-right:0;border-bottom:1px solid var(--line)}
+  .scope,.side-foot{display:none}
+  nav{flex-direction:row;margin-left:auto}
+  nav button{padding:8px 12px;width:auto}
+  nav button span{display:none}
+  .result{grid-template-columns:1fr}
+  .top{padding:16px 16px 12px} .banner{margin:14px 16px 0} .content{padding:14px 16px 22px}
+  .stage{height:min(56vh,420px)}
+}
+@media (max-width:640px){.seg button span{display:none}.seg button{padding:7px 9px}}
+@media (max-width:480px){
+  .top3 .row{grid-template-columns:1.7fr 1fr 44px;gap:8px;font-size:.82rem}
+  .top h1{font-size:1.25rem}
+  .vfoot input[type=range]{width:84px}
+  .stage{height:min(46vh,340px);min-height:240px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 4C10 4 4 9 4 15c0 2.2 1.2 4 3 5 .5-4 3-7.5 8-9.5-3.5 3-5.5 6-6 9.5C16 20 20 14 20 4Z"/></svg>
+      <div><b>Leaf Doctor</b><span>PLANT DISEASE REVIEW</span></div>
+    </div>
+    <div class="scope">
+      <div class="label">Supported crops</div>
+      <b>Leaf photos only</b>
+      <div class="crops"><span class="crop">Tomato</span><span class="crop">Potato</span><span class="crop">Bell pepper</span></div>
+      <small>Other plants are not supported and may get a wrong answer.</small>
+    </div>
+    <nav>
+      <button type="button" id="navScan" class="on">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/></svg>
+        <span>New scan</span>
+      </button>
+      <button type="button" id="navList">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>
+        <span>Supported leaves</span>
+      </button>
+    </nav>
+    <div class="side-foot"><b>Model</b><br>EfficientNet-B0, trained on PlantVillage (15 classes). 99.6% test accuracy on lab-style photos.</div>
+  </aside>
+
+  <main>
+    <div class="top">
+      <div>
+        <div class="label" id="topLabel">Leaf review</div>
+        <h1 id="topTitle">New scan</h1>
+        <div class="sub" id="topSub">Upload a photo of a tomato, potato or bell pepper leaf.</div>
+      </div>
+      <div class="seg" role="group" aria-label="Theme" id="themeSeg">
+        <button type="button" data-t="light" aria-pressed="false" title="Light mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span>Light</span></button>
+        <button type="button" data-t="dark" aria-pressed="false" title="Dark mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg><span>Dark</span></button>
+        <button type="button" data-t="system" aria-pressed="true" title="Match system setting"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg><span>System</span></button>
+      </div>
+    </div>
+    <div class="banner" role="note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5h.01"/></svg>
+      <div><b>Works only on tomato, potato and bell pepper leaves.</b> Photos of any other plant will be forced into one of these crops and the answer will be wrong.</div>
+    </div>
+
+    <div class="content">
+      <section id="pick">
+        <label class="drop" id="drop" for="file">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3M12 4v11M7.5 8.5 12 4l4.5 4.5"/></svg>
+          <b>Choose a leaf photo</b>
+          <span>or drag it here, or paste from the clipboard</span>
+          <em>Tomato · Potato · Bell pepper only</em>
+          <input id="file" class="sr" type="file" accept="image/*">
+        </label>
+        <p class="hint">Best results: one leaf, close up, daylight, in focus, plain background.</p>
+        <p id="notice" class="notice hidden"></p>
+      </section>
+
+      <section id="busy" class="panel busy hidden" aria-live="polite">
+        <img id="prev" alt="Your photo">
+        <div><div class="row"><div class="spin"></div><b>Analyzing</b></div><p id="busyMsg">Looking at the leaf…</p></div>
+      </section>
+
+      <section id="err" class="panel err hidden" role="alert">
+        <p id="errMsg"></p>
+        <button class="btn primary" id="retry" type="button">Try again</button>
+      </section>
+
+      <section id="out" class="result hidden" aria-live="polite">
+        <div class="viewer" id="viewer">
+          <div class="vbar">
+            <button type="button" class="chip-btn" id="heatBtn" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6 6 11a6 6 0 0 1-12 0c0-5 6-11 6-11Z"/></svg>
+              Heatmap
+            </button>
+            <span class="grow"></span>
+            <button type="button" class="chip-btn" id="cmpBtn" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="8" height="14" rx="1.5"/><rect x="13" y="5" width="8" height="14" rx="1.5"/></svg>
+              Compare
+            </button>
+            <button type="button" class="icon-btn" id="fsBtn" title="Full screen" aria-label="Full screen">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+            </button>
+          </div>
+          <div class="stage" id="stage"><div class="inner" id="inner"><div class="panes" id="panes">
+            <div class="pane"><img id="shot" alt="Analyzed leaf"><canvas id="heatA" class="hidden" aria-label="Heatmap overlay"></canvas><span class="ptag hidden" id="tagA">Original</span></div>
+            <div class="pane hidden" id="paneB"><img id="shotB" alt="Leaf with model attention"><canvas id="heatB" aria-label="Heatmap overlay"></canvas><span class="ptag">Model attention</span></div>
+          </div></div></div>
+          <div class="vfoot">
+            <button type="button" class="icon-btn" id="zOut" aria-label="Zoom out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+            <span class="zoomtxt" id="zTxt">100%</span>
+            <button type="button" class="icon-btn" id="zIn" aria-label="Zoom in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+            <span class="grow"></span>
+            <span class="legend hidden" id="legend"><span>Attention</span><i></i><span>low → high</span></span>
+            <label id="opWrap" class="opwrap hidden"><input type="range" id="op" min="10" max="100" value="85" aria-label="Heatmap opacity"><b id="opTxt">85%</b></label>
+          </div>
+        </div>
+
+        <div class="side">
+          <div class="chips" id="chips"></div>
+          <div class="card">
+            <div class="label">Findings</div>
+            <h2 id="vTitle"></h2>
+            <div class="kind" id="vKind"></div>
+            <p id="vSummary"></p>
+            <div class="meter" id="meter"><span>Confidence</span><div class="track"><i id="mFill"></i></div><b id="mPct"></b></div>
+            <div class="top3" id="top3"></div>
+          </div>
+          <div class="card reco" id="reco"></div>
+          <div id="details" style="display:flex;flex-direction:column;gap:10px"></div>
+          <div class="actions">
+            <button class="btn" id="dl" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 11 12 15.5 16.5 11M5 20h14"/></svg>
+              Save report (PDF)
+            </button>
+            <button class="btn primary" id="again" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/></svg>
+              Scan another leaf
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <p class="foot">Student project. Works only on tomato, potato and bell pepper leaves. The model is trained on the PlantVillage dataset (single leaves on plain backgrounds) and can be wrong on field photos. Treatment notes are general guidance from university extension services, not a prescription: check product labels and local agricultural advice before applying any chemical.</p>
+    </div>
+  </main>
+</div>
+
+<dialog id="dlg">
+  <div class="dh"><b>Supported leaves (15 classes)</b><button type="button" class="icon-btn" id="dlgClose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+  <div class="db" id="dlgBody"></div>
+</dialog>
+<div id="ribbon" class="ribbon hidden">demo mode</div>
+
+<script type="module">
+// ---- configuration ----------------------------------------------------------
+const SPACE = "zia2/plant-leaf-disease";             // your Hugging Face Space: "<username>/<space-name>"
+const CLIENT_URL = "https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js";
+const MAX_SIDE = 900;                                // photos are shrunk before upload
+const DEMO = new URLSearchParams(location.search).get("demo");  // ?demo=ok | healthy | low  (offline preview)
+const DEMO_OLD = new URLSearchParams(location.search).has("old");  // demo of an older backend without heat_layer
+const SUPPORTED = {
+  "Bell pepper": ["Bacterial spot", "Healthy"],
+  "Potato": ["Early blight", "Late blight", "Healthy"],
+  "Tomato": ["Bacterial spot", "Early blight", "Late blight", "Leaf mold", "Septoria leaf spot", "Spider mites (two-spotted)", "Target spot", "Yellow leaf curl virus", "Mosaic virus", "Healthy"],
+};
+// -----------------------------------------------------------------------------
+
+const $ = (s) => document.querySelector(s);
+const el = (tag, props = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(props)) {
+    if (k === "class") n.className = v;
+    else if (k === "text") n.textContent = v;
+    else n.setAttribute(k, v);
+  }
+  for (const c of kids.flat()) if (c != null) n.append(c);
+  return n;
+};
+const ICON_ARROW = () => { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("fill", "none"); s.setAttribute("stroke", "currentColor"); s.setAttribute("stroke-width", "1.8"); s.setAttribute("stroke-linecap", "round"); s.setAttribute("stroke-linejoin", "round"); s.innerHTML = '<circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9l3 3-3 3"/>'; return s; };
+const configured = !SPACE.startsWith("YOUR-USERNAME");
+let origURL = "", last = null, zoom = 1;
+
+function show(which) {
+  for (const id of ["pick", "busy", "err", "out"]) $("#" + id).classList.toggle("hidden", id !== which);
+  if (which !== "out") setTop("Leaf review", "New scan", "Upload a photo of a tomato, potato or bell pepper leaf.");
+}
+function setTop(label, title, sub) { $("#topLabel").textContent = label; $("#topTitle").textContent = title; $("#topSub").textContent = sub; }
+function fail(msg) { $("#errMsg").textContent = msg; show("err"); }
+
+// ---- backend ----------------------------------------------------------------
+let clientPromise = null;
+function getClient() {
+  if (!clientPromise) {
+    clientPromise = import(CLIENT_URL).then((m) => m.Client.connect(SPACE));
+    clientPromise.catch(() => { clientPromise = null; });
+  }
+  return clientPromise;
+}
+async function analyze(file) {
+  if (DEMO) return mock(file);
+  const app = await getClient();
+  const res = await app.predict("/analyze", [file]);
+  const data = res.data[0];
+  if (!data || data.error) throw new Error(data && data.error ? data.error : "Empty response");
+  return data;
+}
+
+// ---- flow -------------------------------------------------------------------
+async function downscale(file) {
+  const bmp = await createImageBitmap(file);
+  const s = Math.min(1, MAX_SIDE / Math.max(bmp.width, bmp.height));
+  const c = document.createElement("canvas");
+  c.width = Math.round(bmp.width * s); c.height = Math.round(bmp.height * s);
+  c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+  const blob = await new Promise((r) => c.toBlob(r, "image/jpeg", 0.9));
+  return new File([blob], "leaf.jpg", { type: "image/jpeg" });
+}
+
+async function handle(file) {
+  if (!file || !file.type.startsWith("image/")) return fail("Please choose an image file (JPG or PNG).");
+  if (!DEMO && !configured) return fail("This page is not connected to a Space yet. Set SPACE at the top of the script in index.html.");
+  $("#busyMsg").textContent = "Looking at the leaf…";
+  show("busy");
+  let small;
+  try { small = await downscale(file); } catch { return fail("Could not read that image. Try a JPG or PNG."); }
+  if (origURL) URL.revokeObjectURL(origURL);
+  origURL = URL.createObjectURL(small);
+  $("#prev").src = origURL;
+  const timer = setTimeout(() => { $("#busyMsg").textContent = "Waking up the model. The first request after a pause can take up to a minute…"; }, 8000);
+  try { await render(await analyze(small)); show("out"); topForResult(); }
+  catch (e) { console.error(e); fail("Could not reach the model. If the Space was asleep, open it once to wake it up, wait a minute and try again."); }
+  finally { clearTimeout(timer); }
+}
+
+// ---- viewer -----------------------------------------------------------------
+let heatOn = false, cmpOn = false, hasLayer = false;
+function syncViewer() {
+  const overlayA = heatOn && !cmpOn && hasLayer;
+  $("#heatA").classList.toggle("hidden", !overlayA);
+  $("#paneB").classList.toggle("hidden", !cmpOn);
+  $("#tagA").classList.toggle("hidden", !cmpOn);
+  $("#heatB").classList.toggle("hidden", !hasLayer);
+  $("#heatBtn").setAttribute("aria-pressed", String(heatOn && !cmpOn));
+  $("#cmpBtn").setAttribute("aria-pressed", String(cmpOn));
+  const showCtl = (overlayA || cmpOn) && hasLayer;
+  $("#legend").classList.toggle("hidden", !(overlayA || cmpOn));
+  $("#opWrap").classList.toggle("hidden", !showCtl);
+}
+function setOpacity(v) {
+  $("#heatA").style.opacity = $("#heatB").style.opacity = v / 100;
+  $("#op").value = v; $("#opTxt").textContent = v + "%";
+}
+const loadImg = (src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
+async function paintLayers(layerURL) {
+  const ph = await loadImg(origURL), hl = await loadImg(layerURL);
+  for (const id of ["#heatA", "#heatB"]) {
+    const c = $(id); c.width = ph.naturalWidth; c.height = ph.naturalHeight;
+    c.getContext("2d").drawImage(hl, 0, 0, c.width, c.height);   // stretched like the model input
+  }
+}
+function setZoom(z) {
+  zoom = Math.min(4, Math.max(1, Math.round(z * 4) / 4));
+  $("#inner").style.setProperty("--z", zoom);
+  $("#zTxt").textContent = Math.round(zoom * 100) + "%";
+  const st = $("#stage");   // keep the view centred after zooming
+  st.scrollLeft = (st.scrollWidth - st.clientWidth) / 2;
+  st.scrollTop = (st.scrollHeight - st.clientHeight) / 2;
+}
+
+// ---- result -----------------------------------------------------------------
+const section = (title, items, open) =>
+  el("details", { class: "sec", ...(open ? { open: "" } : {}) }, el("summary", { text: title }), el("ul", {}, items.map((t) => el("li", { text: t }))));
+
+function topForResult() {
+  const { r } = last;
+  setTop("Leaf review", r.confident ? `${r.info.crop}: ${r.info.name}` : "Not sure", `Confidence ${Math.round(r.confidence * 100)}%`);
+}
+
+async function render(r) {
+  const info = r.info, pct = Math.round(r.confidence * 100);
+  const state = !r.confident ? "unsure" : info.kind === "healthy" ? "ok" : "warn";
+  last = { r };
+
+  $("#chips").replaceChildren(
+    el("span", { class: "chip " + state, text: !r.confident ? "Low confidence" : state === "ok" ? "Healthy" : "Disease detected" }),
+    el("span", { class: "chip plain", text: `${pct}% confidence` }));
+
+  $("#vTitle").textContent = !r.confident ? "Not sure" : `${info.crop}: ${info.name}`;
+  $("#vKind").textContent = !r.confident ? "Result below the confidence threshold" : info.kind;
+  $("#vSummary").textContent = !r.confident
+    ? `Best guess is ${r.top[0].name} (${pct}%), which is too uncertain to act on. Check that it is a tomato, potato or bell pepper leaf, then retake the photo: one leaf, close up, in daylight, in focus, on a plain background.`
+    : info.summary;
+  $("#meter").className = "meter " + state;
+  $("#mFill").style.width = pct + "%";
+  $("#mPct").textContent = pct + "%";
+  $("#top3").replaceChildren(...r.top.map((t) =>
+    el("div", { class: "row" },
+      el("span", { class: "nm", text: t.name, title: t.name }),
+      el("span", { class: "bar" }, el("i", { style: `width:${Math.max(2, t.p * 100)}%` })),
+      el("span", { class: "pc", text: (t.p * 100).toFixed(1) + "%" }))));
+
+  // viewer
+  hasLayer = !!r.heat_layer;
+  $("#shot").src = origURL;
+  if (hasLayer) { $("#shotB").src = origURL; await paintLayers(r.heat_layer); }
+  else $("#shotB").src = r.heatmap;            // older backend: side-by-side only
+  $("#heatBtn").classList.toggle("hidden", !hasLayer);
+  heatOn = false; cmpOn = false; setOpacity(85); syncViewer(); setZoom(1);
+
+  // recommendation + details
+  const reco = $("#reco"), d = $("#details");
+  reco.replaceChildren(); d.replaceChildren();
+  if (!r.confident) {
+    reco.append(el("div", { class: "label", text: "Recommendation" }),
+      el("div", { class: "head", text: "Retake the photo" }),
+      el("div", { class: "line" }, ICON_ARROW(), el("span", { text: "Use a single tomato, potato or bell pepper leaf, close up and in focus, in daylight on a plain background." })));
+    return;
+  }
+  reco.append(el("div", { class: "label", text: "Recommendation" }),
+    el("div", { class: "head", text: info.kind === "healthy" ? "No treatment needed" : info.name }),
+    el("div", { class: "line" }, ICON_ARROW(), el("span", { text: info.treatment[0] })));
+  if (info.kind !== "healthy") reco.append(el("div", { class: "cure" }, el("b", { text: "Is there a cure?" }), el("p", { text: info.cure_note })));
+  if (info.symptoms.length) d.append(section("What to look for", info.symptoms, false));
+  d.append(section(info.kind === "healthy" ? "Care tips" : "What to do now", info.treatment, false));
+  d.append(section("Prevention", info.prevention, false));
+  const links = info.sources.filter((s) => /^https?:\/\//.test(s.url));
+  if (links.length) d.append(el("details", { class: "sec" }, el("summary", { text: "Sources" }),
+    el("ul", {}, links.map((s) => el("li", {}, el("a", { href: s.url, target: "_blank", rel: "noopener noreferrer", text: s.title }))))));
+}
+
+function reportText() {
+  const { r } = last, info = r.info, pct = (r.confidence * 100).toFixed(1);
+  const L = ["LEAF DOCTOR REPORT", new Date().toLocaleString(), ""];
+  L.push(r.confident ? `Result: ${info.crop}: ${info.name} (${pct}% confidence)` : `Result: not sure (best guess ${r.top[0].name}, ${pct}%)`, "");
+  L.push("Model's top 3:", ...r.top.map((t) => `  - ${t.name}: ${(t.p * 100).toFixed(1)}%`), "");
+  if (r.confident) {
+    L.push(info.summary, "");
+    if (info.kind !== "healthy") L.push("Is there a cure? " + info.cure_note, "");
+    L.push(info.kind === "healthy" ? "Care tips:" : "What to do now:", ...info.treatment.map((t) => "  - " + t), "");
+    L.push("Prevention:", ...info.prevention.map((t) => "  - " + t), "");
+    const links = info.sources.filter((s) => /^https?:\/\//.test(s.url));
+    if (links.length) L.push("Sources:", ...links.map((s) => `  - ${s.title}: ${s.url}`), "");
+  }
+  L.push("Supported leaves: tomato, potato, bell pepper only. Student project; general guidance, not a prescription. Check product labels and local agricultural advice before applying any chemical.");
+  return L.join("\n");
+}
+
+// ---- PDF report (hand-built, no libraries) -----------------------------------
+const WINANSI = { "–": "\x96", "—": "\x97", "‘": "\x91", "’": "\x92", "“": "\x93", "”": "\x94", "•": "\x95", "…": "\x85", "™": "\x99" };
+const pdfSafe = (t) => String(t).replace(/[ -​  ]/g, " ").replace(/→/g, "->").replace(/≥/g, ">=").replace(/≤/g, "<=")
+  .replace(/[^\x00-\xff]/g, (ch) => WINANSI[ch] || "?");
+const pdfEsc = (t) => pdfSafe(t).replace(/[\\()]/g, "\\$&");
+const toBytes = (s) => Uint8Array.from(s, (c) => c.charCodeAt(0) & 255);
+const jpegBytes = (c) => new Promise((res) => c.toBlob(async (b) => res(new Uint8Array(await b.arrayBuffer())), "image/jpeg", 0.88));
+
+async function buildPdf(r) {
+  const info = r.info, pct = (r.confidence * 100).toFixed(1);
+  const state = !r.confident ? "unsure" : info.kind === "healthy" ? "ok" : "warn";
+  const COL = { ok: "0.09 0.5 0.24", warn: "0.71 0.33 0.04", unsure: "0.35 0.41 0.54", ink: "0.1 0.13 0.18", mut: "0.42 0.47 0.57", link: "0.15 0.39 0.82", track: "0.88 0.9 0.94", accent: "0.18 0.42 0.85" };
+
+  // images: the leaf photo, and the photo with the transparent Grad-CAM layer on top
+  const ph = await loadImg(origURL);
+  const c1 = document.createElement("canvas"); c1.width = ph.naturalWidth; c1.height = ph.naturalHeight;
+  c1.getContext("2d").drawImage(ph, 0, 0);
+  const c2 = document.createElement("canvas"); c2.width = c1.width; c2.height = c1.height;
+  const g2 = c2.getContext("2d"); g2.drawImage(ph, 0, 0);
+  if (r.heat_layer) { g2.globalAlpha = 0.85; g2.drawImage(await loadImg(r.heat_layer), 0, 0, c2.width, c2.height); }
+  else g2.drawImage(await loadImg(r.heatmap), 0, 0, c2.width, c2.height);
+  const imgs = [await jpegBytes(c1), await jpegBytes(c2)];
+
+  // layout helpers (PDF points, origin bottom-left; widths measured with Arial = Helvetica metrics)
+  const mc = document.createElement("canvas").getContext("2d");
+  const wd = (t, sz, b) => { mc.font = `${b ? "bold " : ""}${sz}px Arial, Helvetica, sans-serif`; return mc.measureText(t).width; };
+  const PW = 595.28, PH = 841.89, M = 48, CW = PW - 2 * M, BOT = M + 24;
+  const pages = []; let y = 0;
+  const newPage = () => { pages.push({ ops: [], links: [] }); y = PH - M; };
+  const cur = () => pages[pages.length - 1];
+  const need = (h) => { if (y - h < BOT) newPage(); };
+  const wrap = (t, sz, b, w) => {
+    const out = []; let line = "";
+    for (const word of String(t).split(/\s+/).filter(Boolean)) {
+      const tr = line ? line + " " + word : word;
+      if (line && wd(tr, sz, b) > w) { out.push(line); line = word; } else line = tr;
+    }
+    if (line) out.push(line);
+    return out;
+  };
+  const put = (t, x, yy, sz, b, col) => cur().ops.push(`BT /${b ? "F2" : "F1"} ${sz} Tf ${col} rg ${x.toFixed(2)} ${yy.toFixed(2)} Td (${pdfEsc(t)}) Tj ET`);
+  const rule = (x, yy, w, h, col) => cur().ops.push(`${col} rg ${x.toFixed(2)} ${yy.toFixed(2)} ${w.toFixed(2)} ${h} re f`);
+  const para = (t, o = {}) => {
+    const { sz = 10.5, b = false, col = COL.ink, x = M, w = CW, lead = sz * 1.42, gap = 0 } = o;
+    for (const ln of wrap(t, sz, b, w)) { need(lead); put(ln, x, y - sz, sz, b, col); y -= lead; }
+    y -= gap;
+  };
+  const heading = (t) => { need(66); y -= 10; para(t, { sz: 12, b: true, gap: 3 }); };
+  const bullets = (items) => {
+    for (const t of items) wrap(t, 10.5, false, CW - 14).forEach((ln, i) => {
+      need(15); if (i === 0) put("•", M + 2, y - 10.5, 10.5, false, COL.ink);
+      put(ln, M + 14, y - 10.5, 10.5, false, COL.ink); y -= 15;
+    });
+    y -= 2;
+  };
+
+  // header
+  newPage();
+  put("Leaf Doctor report", M, y - 18, 18, true, COL.ok);
+  const date = new Date().toLocaleString();
+  put(date, PW - M - wd(date, 9, false), y - 15, 9, false, COL.mut);
+  y -= 28; rule(M, y, CW, 1, COL.track); y -= 18;
+
+  // result
+  para(!r.confident ? "Not sure" : `${info.crop}: ${info.name}`, { sz: 18, b: true, col: COL[state], lead: 24 });
+  para(`${!r.confident ? "Low confidence" : state === "ok" ? "Healthy leaf" : "Disease detected"}  |  ${pct}% confidence`, { sz: 10.5, col: COL.mut, gap: 10 });
+
+  // images side by side
+  const gap = 16, boxW = (CW - gap) / 2, sc = Math.min(boxW / c1.width, 200 / c1.height);
+  const iw = c1.width * sc, ih = c1.height * sc;
+  need(ih + 34);
+  [["Im1", "Your photo"], ["Im2", "Where the model looked (Grad-CAM)"]].forEach(([name, cap], i) => {
+    const x = M + i * (boxW + gap);
+    cur().ops.push(`q ${iw.toFixed(2)} 0 0 ${ih.toFixed(2)} ${x.toFixed(2)} ${(y - ih).toFixed(2)} cm /${name} Do Q`);
+    put(cap, x, y - ih - 12, 8.5, false, COL.mut);
+  });
+  y -= ih + 26;
+
+  // top 3
+  heading("Model's top 3 predictions");
+  for (const t of r.top) {
+    need(17);
+    put(t.name, M, y - 10, 10, false, COL.ink);
+    const bx = M + 215, bw = CW - 215 - 52;
+    rule(bx, y - 9, bw, 6, COL.track); rule(bx, y - 9, Math.max(2, bw * t.p), 6, COL.accent);
+    const p = (t.p * 100).toFixed(1) + "%"; put(p, PW - M - wd(p, 10, false), y - 10, 10, false, COL.mut);
+    y -= 17;
+  }
+
+  if (!r.confident) {
+    heading("Recommendation");
+    para(`The best guess (${r.top[0].name}, ${pct}%) is too uncertain to act on. Check that it is a tomato, potato or bell pepper leaf, then retake the photo: one leaf, close up, in daylight, in focus, on a plain background.`);
+  } else {
+    heading("Findings");
+    para(info.summary);
+    if (info.kind !== "healthy") { y -= 4; para("Is there a cure?", { b: true }); para(info.cure_note); }
+    if (info.symptoms.length) { heading("What to look for"); bullets(info.symptoms); }
+    heading(info.kind === "healthy" ? "Care tips" : "What to do now"); bullets(info.treatment);
+    heading("Prevention"); bullets(info.prevention);
+    const links = info.sources.filter((s) => /^https?:\/\//.test(s.url));
+    if (links.length) {
+      heading("Sources");
+      for (const s of links) for (const ln of wrap(s.title, 10, false, CW)) {
+        need(15); const w = wd(ln, 10, false);
+        put(ln, M, y - 10, 10, false, COL.link); rule(M, y - 12, w, 0.5, COL.link);
+        cur().links.push({ r: [M, y - 13, M + w, y], url: s.url }); y -= 15;
+      }
+    }
+  }
+  y -= 8;
+  para("Works only on tomato, potato and bell pepper leaves. Student project: the model is trained on the PlantVillage dataset (single leaves on plain backgrounds) and can be wrong on field photos. Treatment notes are general guidance from university extension services, not a prescription: check product labels and local agricultural advice before applying any chemical.", { sz: 8.5, col: COL.mut });
+
+  // footers
+  pages.forEach((p, i) => {
+    cur_ops(p, `Leaf Doctor  |  tomato, potato and bell pepper leaves only`, M, 30, COL.mut);
+    const n = `Page ${i + 1} of ${pages.length}`; cur_ops(p, n, PW - M - wd(n, 8, false), 30, COL.mut);
+  });
+  function cur_ops(p, t, x, yy, col) { p.ops.push(`BT /F1 8 Tf ${col} rg ${x.toFixed(2)} ${yy} Td (${pdfEsc(t)}) Tj ET`); }
+
+  // assemble the file
+  let nid = 7; const ids = pages.map((p) => ({ c: nid++, a: p.links.map(() => nid++), p: nid++ }));
+  const parts = []; let pos = 0; const off = {};
+  const push = (u) => { parts.push(u); pos += u.length; };
+  const str = (s) => push(toBytes(s));
+  const obj = (id, dict, stream) => {
+    off[id] = pos;
+    if (stream) { str(`${id} 0 obj\n<< ${dict} /Length ${stream.length} >>\nstream\n`); push(stream); str("\nendstream\nendobj\n"); }
+    else str(`${id} 0 obj\n${dict}\nendobj\n`);
+  };
+  str("%PDF-1.4\n%\xE2\xE3\xCF\xD3\n");
+  obj(1, "<< /Type /Catalog /Pages 2 0 R >>");
+  obj(2, `<< /Type /Pages /Count ${pages.length} /Kids [${ids.map((i) => i.p + " 0 R").join(" ")}] >>`);
+  obj(3, "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>");
+  obj(4, "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>");
+  [c1, c2].forEach((c, i) => obj(5 + i, `/Type /XObject /Subtype /Image /Width ${c.width} /Height ${c.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode`, imgs[i]));
+  pages.forEach((p, i) => {
+    obj(ids[i].c, "", toBytes(p.ops.join("\n")));
+    p.links.forEach((l, k) => obj(ids[i].a[k], `<< /Type /Annot /Subtype /Link /Rect [${l.r.map((v) => v.toFixed(2)).join(" ")}] /Border [0 0 0] /A << /S /URI /URI (${pdfEsc(l.url)}) >> >>`));
+    obj(ids[i].p, `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PW} ${PH}] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /XObject << /Im1 5 0 R /Im2 6 0 R >> >> /Contents ${ids[i].c} 0 R${p.links.length ? ` /Annots [${ids[i].a.map((a) => a + " 0 R").join(" ")}]` : ""} >>`);
+  });
+  const max = nid - 1, xref = pos;
+  str(`xref\n0 ${max + 1}\n0000000000 65535 f \n`);
+  for (let id = 1; id <= max; id++) str(String(off[id]).padStart(10, "0") + " 00000 n \n");
+  str(`trailer\n<< /Size ${max + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);
+  return new Blob(parts, { type: "application/pdf" });
+}
+
+async function saveReport() {
+  const btn = $("#dl"), label = btn.lastChild.textContent;
+  btn.disabled = true; btn.lastChild.textContent = " Building PDF…";
+  let blob, name = "leaf-doctor-report";
+  try {
+    blob = await buildPdf(last.r); name += ".pdf";
+  } catch (e) {            // never lose the report: fall back to plain text
+    console.error(e); blob = new Blob([reportText()], { type: "text/plain" }); name += ".txt";
+  }
+  const a = el("a", { href: URL.createObjectURL(blob), download: name });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  btn.disabled = false; btn.lastChild.textContent = label;
+}
+
+// ---- wiring -----------------------------------------------------------------
+$("#file").addEventListener("change", (e) => { const f = e.target.files[0]; e.target.value = ""; handle(f); });
+const drop = $("#drop");
+drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("over"); });
+drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+drop.addEventListener("drop", (e) => { e.preventDefault(); drop.classList.remove("over"); handle(e.dataTransfer.files[0]); });
+window.addEventListener("dragover", (e) => e.preventDefault());
+window.addEventListener("drop", (e) => e.preventDefault());
+window.addEventListener("paste", (e) => {
+  const item = [...(e.clipboardData?.items || [])].find((i) => i.type.startsWith("image/"));
+  if (item) handle(item.getAsFile());
+});
+$("#heatBtn").addEventListener("click", () => { cmpOn = false; heatOn = !heatOn; syncViewer(); });
+$("#cmpBtn").addEventListener("click", () => { cmpOn = !cmpOn; heatOn = false; syncViewer(); });
+$("#op").addEventListener("input", (e) => setOpacity(+e.target.value));
+$("#zIn").addEventListener("click", () => setZoom(zoom + 0.5));
+$("#zOut").addEventListener("click", () => setZoom(zoom - 0.5));
+$("#fsBtn").addEventListener("click", () => { const v = $("#viewer"); document.fullscreenElement ? document.exitFullscreen() : v.requestFullscreen?.(); });
+$("#again").addEventListener("click", () => show("pick"));
+$("#retry").addEventListener("click", () => show("pick"));
+$("#navScan").addEventListener("click", () => show("pick"));
+$("#dl").addEventListener("click", saveReport);
+
+// theme: light / dark / system (remembered per browser)
+const mq = window.matchMedia("(prefers-color-scheme: dark)");
+let themePref = "system";
+try { themePref = localStorage.getItem("ld-theme") || "system"; } catch {}
+function applyTheme() {
+  document.documentElement.dataset.theme = themePref === "system" ? (mq.matches ? "dark" : "light") : themePref;
+  for (const b of document.querySelectorAll("#themeSeg button")) b.setAttribute("aria-pressed", String(b.dataset.t === themePref));
+}
+document.querySelector("#themeSeg").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  themePref = b.dataset.t;
+  try { localStorage.setItem("ld-theme", themePref); } catch {}
+  applyTheme();
+});
+mq.addEventListener("change", () => { if (themePref === "system") applyTheme(); });
+applyTheme();
+
+// supported-leaves dialog
+const body = $("#dlgBody");
+body.append(el("p", { text: "This model was trained on three crops only. Anything else will be forced into one of these classes." }));
+for (const [crop, list] of Object.entries(SUPPORTED)) body.append(el("h3", { text: crop }), el("ul", {}, list.map((n) => el("li", { text: n }))));
+$("#navList").addEventListener("click", () => $("#dlg").showModal());
+$("#dlgClose").addEventListener("click", () => $("#dlg").close());
+$("#dlg").addEventListener("click", (e) => { if (e.target === e.currentTarget) e.currentTarget.close(); });
+
+if (!DEMO && !configured) { const n = $("#notice"); n.textContent = "Setup needed: put your Space name in SPACE at the top of the script in index.html."; n.classList.remove("hidden"); }
+if (!DEMO && configured) getClient().catch(() => {});   // warm up the connection
+
+// ---- demo mode (offline preview, no Space needed) ---------------------------------
+const SAMPLE = {
+  ok: { name: "Tomato: Late blight", info: { crop: "Tomato", name: "Late blight", kind: "oomycete (water mold) disease",
+    summary: "A very aggressive disease (Phytophthora infestans) of tomato and potato. It thrives in cool, wet weather and can destroy a planting in a few days.",
+    symptoms: ["Large, irregular brown or burnt-looking patches on leaves, often starting at the outer canopy", "Dark lesions on stems and large, firm brown blotches on fruit; white mold in humid conditions"],
+    cure_note: "There is no cure, and no tomato variety is fully resistant. Prevention and quick removal of infected plants are what work.",
+    treatment: ["Remove infected plants promptly and bag or destroy them so spores do not spread (do not compost).", "Protectant fungicides only work if applied before infection; follow the product label."],
+    prevention: ["Buy healthy transplants and destroy volunteer tomato and potato plants.", "Use drip irrigation, space plants and keep foliage dry."],
+    sources: [{ title: "WVU Extension: Late blight of tomatoes", url: "https://extension.wvu.edu/lawn-gardening-pests/plant-disease/fruit-vegetable-diseases/late-blight-tomatoes" }] }, conf: 0.973 },
+  healthy: { name: "Tomato: Healthy leaf", info: { crop: "Tomato", name: "Healthy leaf", kind: "healthy", summary: "No sign of the diseases this model knows about.",
+    symptoms: [], cure_note: "Nothing to cure.", treatment: ["No treatment needed. Scout weekly, including the undersides of leaves."],
+    prevention: ["Water at the base in the morning and avoid wetting foliage.", "Rotate crops and clear debris at season end."], sources: [] }, conf: 0.991 },
+  low: { name: "Tomato: Early blight", info: null, conf: 0.52 },
+};
+async function fakeHeat(blob) {
+  const bmp = await createImageBitmap(blob);
+  const c = document.createElement("canvas"); c.width = bmp.width; c.height = bmp.height;
+  const g = c.getContext("2d"); g.drawImage(bmp, 0, 0);
+  const gr = g.createRadialGradient(c.width * .48, c.height * .5, 10, c.width * .48, c.height * .5, c.width * .3);
+  gr.addColorStop(0, "rgba(255,40,0,.6)"); gr.addColorStop(.5, "rgba(255,220,0,.35)"); gr.addColorStop(1, "rgba(0,80,255,0)");
+  g.fillStyle = gr; g.fillRect(0, 0, c.width, c.height);
+  return c.toDataURL("image/jpeg", .85);
+}
+function fakeLayer() {   // transparent Grad-CAM-like layer, as the real backend returns
+  const c = document.createElement("canvas"); c.width = c.height = 224;
+  const g = c.getContext("2d");
+  const gr = g.createRadialGradient(108, 112, 4, 108, 112, 62);
+  gr.addColorStop(0, "rgba(255,40,0,.85)"); gr.addColorStop(.45, "rgba(255,210,0,.55)"); gr.addColorStop(1, "rgba(0,160,255,0)");
+  g.fillStyle = gr; g.fillRect(0, 0, 224, 224);
+  return c.toDataURL("image/png");
+}
+async function mock(file) {
+  await new Promise((r) => setTimeout(r, 700));
+  const s = SAMPLE[DEMO] || SAMPLE.ok;
+  const rest = s.conf < .7 ? [["Tomato: Septoria leaf spot", .34], ["Potato: Early blight", .12]] : [["Tomato: Early blight", .017], ["Potato: Late blight", .006]];
+  const top = [{ name: s.name, p: s.conf }, ...rest.map(([name, p]) => ({ name, p }))];
+  return { confidence: s.conf, confident: s.conf >= 0.7, threshold: 0.7, top, heatmap: await fakeHeat(file), heat_layer: DEMO_OLD ? undefined : fakeLayer(), info: s.info };
+}
+async function sampleLeaf() {
+  const c = document.createElement("canvas"); c.width = 640; c.height = 480;
+  const g = c.getContext("2d");
+  g.fillStyle = "#e9e4d8"; g.fillRect(0, 0, 640, 480);
+  g.fillStyle = "#3f8f4a"; g.beginPath(); g.ellipse(320, 240, 230, 140, -.35, 0, Math.PI * 2); g.fill();
+  g.strokeStyle = "#2c6a35"; g.lineWidth = 5; g.beginPath(); g.moveTo(120, 340); g.lineTo(520, 140); g.stroke();
+  g.fillStyle = "#6b4a2b";
+  for (const [x, y, r] of [[270, 250, 26], [360, 200, 20], [310, 170, 14], [400, 260, 18]]) { g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); }
+  return new Promise((r) => c.toBlob(r, "image/jpeg", .9));
+}
+if (DEMO) {
+  $("#ribbon").classList.remove("hidden");
+  sampleLeaf().then((b) => handle(new File([b], "sample.jpg", { type: "image/jpeg" })));
+}
+</script>
+</body>
+</html>

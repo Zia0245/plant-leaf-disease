@@ -1,0 +1,372 @@
+{
+  "Pepper__bell___Bacterial_spot": {
+    "crop": "Bell pepper",
+    "name": "Bacterial spot",
+    "kind": "bacterial disease",
+    "summary": "A bacterial leaf and fruit disease (Xanthomonas) that spreads in warm, wet weather through splashing water, contaminated seed and handling of wet plants.",
+    "symptoms": [
+      "Small yellow-green, water-soaked spots on leaves that turn brown with yellow halos",
+      "Leaf drop in bad cases; raised, scabby spots on fruit"
+    ],
+    "cure_note": "There is no cure once it is established. Management is about slowing spread and protecting new growth, so act early.",
+    "treatment": [
+      "Remove and destroy heavily infected plants or leaves; do not handle the plants when they are wet",
+      "Apply a copper-based bactericide registered for peppers as a preventive spray, following the label. Copper alone used continuously gives only partial control",
+      "Water at the base (drip or soaker); avoid overhead irrigation",
+      "Keep fertility balanced; under-fed plants are hit harder"
+    ],
+    "prevention": [
+      "Plant resistant pepper varieties where available; this is the first line of defence",
+      "Start with disease-free seed and transplants and inspect seedlings often",
+      "Rotate away from peppers and tomatoes, remove crop debris and control weeds"
+    ],
+    "sources": [
+      {"title": "WVU Extension: Bacterial leaf spot of pepper", "url": "https://extension.wvu.edu/lawn-gardening-pests/plant-disease/fruit-vegetable-diseases/bacterial-leaf-spot-of-pepper"},
+      {"title": "UF/IFAS EDIS PP362: Bacterial spot of pepper", "url": "https://edis.ifas.ufl.edu/publication/PP362/pdf"},
+      {"title": "Growing Produce (UGA Extension): Pepper growers must be proactive with bacterial spot", "url": "https://www.growingproduce.com/?p=56615"}
+    ]
+  },
+  "Pepper__bell___healthy": {
+    "crop": "Bell pepper",
+    "name": "Healthy leaf",
+    "kind": "healthy",
+    "summary": "No sign of the diseases this model knows about.",
+    "symptoms": [],
+    "cure_note": "Nothing to cure.",
+    "treatment": [
+      "No treatment needed. Keep scouting leaves (including undersides) every few days"
+    ],
+    "prevention": [
+      "Water at the base in the morning so leaves dry quickly",
+      "Space plants for airflow, keep weeds down and remove fallen debris",
+      "Use resistant varieties and disease-free transplants next season"
+    ],
+    "sources": []
+  },
+  "Potato___Early_blight": {
+    "crop": "Potato",
+    "name": "Early blight",
+    "kind": "fungal disease",
+    "summary": "A fungal disease (Alternaria solani) that starts on older leaves, favoured by warm, humid weather and leaf wetness, and can also affect tubers.",
+    "symptoms": [
+      "Brown leaf spots with concentric rings (a target look)",
+      "Older leaves yellow and die first; sunken dark lesions on tubers"
+    ],
+    "cure_note": "Spots already on a leaf do not heal, but the spread can be controlled and later growth protected.",
+    "treatment": [
+      "Apply a protectant fungicide such as chlorothalonil or mancozeb on a 7-10 day schedule, depending on weather and the product label",
+      "After flowering, extension services recommend adding systemic fungicides for several sprays, rotating products by FRAC group to avoid resistance",
+      "Remove badly infected foliage and keep the crop well fed and watered; stressed plants are more susceptible"
+    ],
+    "prevention": [
+      "Rotate to non-host crops for at least 3 years (avoid tomato, eggplant and pepper in between)",
+      "Plant certified, disease-free seed; later-maturing varieties are less susceptible",
+      "Handle tubers gently and store lesion-free tubers cool, dry and ventilated"
+    ],
+    "sources": [
+      {"title": "NDSU Extension PP1892: Early blight of potato", "url": "https://www.ndsu.edu/agriculture/sites/default/files/2025-11/PP1892%20Early%20Blight%20in%20Potato.pdf"},
+      {"title": "University of Delaware Weekly Crop Update: early blight", "url": "https://sites.udel.edu/weeklycropupdate/?p=2125"},
+      {"title": "Auburn/ACES ANR-1052: Early blight of potato", "url": "https://webarchive.library.unt.edu/eot2008/20090115212039/http://www.aces.edu/pubs/docs/A/ANR-1052"}
+    ]
+  },
+  "Potato___Late_blight": {
+    "crop": "Potato",
+    "name": "Late blight",
+    "kind": "oomycete (water mold) disease",
+    "summary": "A fast, destructive disease caused by Phytophthora infestans. Cool, wet weather favours it and a field can be defoliated within days to a few weeks.",
+    "symptoms": [
+      "Water-soaked green to dark spots on leaves, often with pale halos, and dark lesions on stems",
+      "White fuzzy growth under leaves in humid weather; reddish-brown dry rot under the skin of tubers"
+    ],
+    "cure_note": "There is no cure. Control depends on prevention and on destroying infected tissue so it stops releasing spores.",
+    "treatment": [
+      "Act at once: destroy infected plants or foliage so the pathogen cannot keep producing spores, and tell your local extension or agriculture office because it spreads between farms",
+      "Protectant fungicides must go on before infection and be repeated through wet spells; use products labelled for late blight and rotate FRAC groups",
+      "Kill vines completely before harvest and wait before digging tubers, and avoid bruising them",
+      "Store tubers cool and ventilated, and grade out suspect tubers"
+    ],
+    "prevention": [
+      "Plant only certified blight-free seed tubers",
+      "Destroy cull piles and volunteer potatoes, and control nightshade weeds",
+      "Avoid long leaf-wetness periods and watch local blight alerts"
+    ],
+    "sources": [
+      {"title": "NDSU Extension PP1849: Late blight in potato", "url": "https://www.ndsu.edu/agriculture/extension/publications/late-blight-potato"},
+      {"title": "UAF Extension: Control strategies for late blight", "url": "https://uaf.edu/ces/publications/database/gardening/control-strategy-late-blight.php"},
+      {"title": "UMaine Extension Bulletin 2417: Protecting potato tubers from late blight", "url": "https://extension.umaine.edu/publications/2417e/"}
+    ]
+  },
+  "Potato___healthy": {
+    "crop": "Potato",
+    "name": "Healthy leaf",
+    "kind": "healthy",
+    "summary": "No sign of the diseases this model knows about.",
+    "symptoms": [],
+    "cure_note": "Nothing to cure.",
+    "treatment": [
+      "No treatment needed. Keep checking leaves weekly, especially after cool, wet weather"
+    ],
+    "prevention": [
+      "Use certified seed tubers and rotate crops",
+      "Remove volunteer potatoes and nightshade weeds",
+      "Avoid prolonged leaf wetness; irrigate in the morning"
+    ],
+    "sources": []
+  },
+  "Tomato_Bacterial_spot": {
+    "crop": "Tomato",
+    "name": "Bacterial spot",
+    "kind": "bacterial disease",
+    "summary": "A bacterial disease (Xanthomonas species) of leaves, stems and fruit that spreads by splashing water and on seed, transplants and hands.",
+    "symptoms": [
+      "Small, angular dark spots on leaves, often with yellow halos",
+      "Raised, scabby spots on fruit"
+    ],
+    "cure_note": "There is no curative treatment. Preventive measures reduce spread but will not clear an infected plant.",
+    "treatment": [
+      "Remove and destroy the worst infected plants and leaves; avoid working among wet plants",
+      "Preventive copper-based sprays are used in warm, wet periods, but copper-resistant strains are common, so copper is only a partial tool. Follow the product label and local advice",
+      "Use drip irrigation instead of overhead watering"
+    ],
+    "prevention": [
+      "Buy tested, disease-free seed and transplants; hot-water seed treatment can help",
+      "Wait at least a year before replanting tomatoes in the same spot and remove volunteer tomato plants",
+      "Clear and dispose of crop debris after harvest",
+      "No commercial tomato varieties are fully resistant, so keep other measures in place"
+    ],
+    "sources": [
+      {"title": "UW-Madison Extension Horticulture: Bacterial spot of tomato", "url": "https://hort.extension.wisc.edu/articles/bacterial-spot-of-tomato/"},
+      {"title": "Purdue Vegetable Crops Hotline: Copper products for bacterial spot of tomato", "url": "https://vegcropshotline.org/article/an-update-on-the-use-of-copper-products-for-managing-bacterial-spot-of-tomato/"},
+      {"title": "Plantwise factsheet: Protective sprays for bacterial spot on tomato", "url": "https://farmknowledge.info/sites/default/files/resource/20177801113.pdf"}
+    ]
+  },
+  "Tomato_Early_blight": {
+    "crop": "Tomato",
+    "name": "Early blight",
+    "kind": "fungal disease",
+    "summary": "A fungal disease (Alternaria) that starts on the lowest leaves and moves up, favoured by warm, wet weather and overhead watering.",
+    "symptoms": [
+      "Brown spots with concentric rings (target-like) surrounded by yellowing",
+      "Lower leaves die and drop; stem and fruit lesions can also occur"
+    ],
+    "cure_note": "Existing spots do not heal, but spread can be slowed and many plants tolerate a lot of early blight without losing much yield.",
+    "treatment": [
+      "Catch it early and prune off infected lower leaves, but never remove more than about one third of the foliage",
+      "Wash hands and sanitize pruning tools after touching infected plants, and dispose of removed leaves away from the garden",
+      "Where disease pressure is high, extension services suggest a protectant fungicide program starting at fruit set on a 7-14 day schedule. Home gardeners often do not need fungicide",
+      "Keep leaves dry: water at the base, mulch and avoid wetting foliage"
+    ],
+    "prevention": [
+      "Choose resistant or tolerant varieties (often marked EB), though resistance is not immunity",
+      "Stake or trellis, space plants about two feet apart and remove the lowest leaves",
+      "Rotate out of tomatoes and related crops for at least two years and control nightshade weeds",
+      "Keep plants fed and watered; stressed plants are more susceptible"
+    ],
+    "sources": [
+      {"title": "University of Minnesota Extension: Early blight of tomato and potato", "url": "https://extension.umn.edu/disease-management/early-blight-tomato-and-potato"},
+      {"title": "Colorado State Extension: Tomato early blight", "url": "https://extension.colostate.edu/resource/tomato-early-blight/"},
+      {"title": "Oklahoma State Extension: Early blight of tomato", "url": "https://extension.okstate.edu/programs/digital-diagnostics/plant-diseases/early-blight-of-tomato.html"}
+    ]
+  },
+  "Tomato_Late_blight": {
+    "crop": "Tomato",
+    "name": "Late blight",
+    "kind": "oomycete (water mold) disease",
+    "summary": "A very aggressive disease (Phytophthora infestans) of tomato and potato. It thrives in cool, wet weather and can destroy a planting in a few days.",
+    "symptoms": [
+      "Large, irregular brown or burnt-looking patches on leaves, often starting at the outer canopy",
+      "Dark lesions on stems and large, firm brown blotches on fruit; white mold in humid conditions"
+    ],
+    "cure_note": "There is no cure, and no tomato variety is fully resistant. Prevention and quick removal of infected plants are what work.",
+    "treatment": [
+      "Remove infected plants promptly and bag or destroy them so spores do not spread (do not compost). Warn nearby growers, because spores travel on wind",
+      "Protectant fungicides only work if applied before infection; extension services advise a weekly program when weather favours the disease. Home gardeners can use fixed copper products (permitted in organic production)",
+      "Do not keep infected fruit for storage"
+    ],
+    "prevention": [
+      "Buy healthy transplants and destroy volunteer tomato and potato plants and nightshade weeds",
+      "Use drip irrigation, space plants and keep foliage dry",
+      "Some varieties are more tolerant, though none is immune"
+    ],
+    "sources": [
+      {"title": "WVU Extension: Late blight of tomatoes", "url": "https://extension.wvu.edu/lawn-gardening-pests/plant-disease/fruit-vegetable-diseases/late-blight-tomatoes"},
+      {"title": "UConn Extension: Late blight of tomato", "url": "https://ipm.cahnr.uconn.edu/tomato-late-blight/"},
+      {"title": "UW-Madison Extension: Tomato late blight identification and management", "url": "https://barron.extension.wisc.edu/files/2023/02/Tomato-Late-Blight.pdf"}
+    ]
+  },
+  "Tomato_Leaf_Mold": {
+    "crop": "Tomato",
+    "name": "Leaf mold",
+    "kind": "fungal disease",
+    "summary": "A fungal disease (Passalora fulva) that is driven by high humidity, mainly in greenhouses and high tunnels, but also outdoors in long damp spells.",
+    "symptoms": [
+      "Pale green to yellow spots on the upper leaf surface",
+      "Olive-grey to purplish mold on the underside; leaves curl, wither and drop"
+    ],
+    "cure_note": "Infected leaves do not recover, but the disease can usually be stopped by lowering humidity and removing affected leaves.",
+    "treatment": [
+      "Keep relative humidity below about 85%: open vents or tunnel sides, use fans and avoid wetting leaves",
+      "Prune and destroy early-affected leaves if practical, and thin the canopy for airflow",
+      "Foliar fungicides help when combined with the steps above; spray the leaf undersides and follow the label"
+    ],
+    "prevention": [
+      "Use resistant varieties (resistance can vary with local strains)",
+      "Space plants, avoid overhead watering and handling plants in humid conditions",
+      "Remove and destroy plant debris after harvest and rotate the growing location"
+    ],
+    "sources": [
+      {"title": "University of Kentucky PPFS-VG-52: Leaf mold of tomato", "url": "https://plantpathology.ca.uky.edu/sites/plantpathology.ca.uky.edu/files/PPFS-VG-52.pdf"},
+      {"title": "Ohio State: High tunnel disease facts, leaf mold", "url": "https://u.osu.edu/hightunneldiseasefacts/?p=146"},
+      {"title": "Cornell Plant Pathology: Leaf mold on tomatoes", "url": "https://blogs.cornell.edu/livegpath/gallery/tomato/tomato-leaf-mold"}
+    ]
+  },
+  "Tomato_Septoria_leaf_spot": {
+    "crop": "Tomato",
+    "name": "Septoria leaf spot",
+    "kind": "fungal disease",
+    "summary": "A common fungal disease (Septoria lycopersici) that starts on the lowest leaves and climbs the plant in humid, rainy weather.",
+    "symptoms": [
+      "Many small round spots with grey or tan centers and dark brown borders",
+      "Tiny black dots inside the spots; yellowing, leaf drop and sunscald on exposed fruit"
+    ],
+    "cure_note": "Spots do not reverse, but the spread can be slowed enough to protect most of the crop.",
+    "treatment": [
+      "Remove infected lower leaves, avoid working plants while they are wet, and clear infected debris and nightshade weeds",
+      "Water at the base and prune the lowest leaf branches once plants are established",
+      "Fungicides used for early blight also work on Septoria; extension advice is a shorter 7-10 day interval, following the label"
+    ],
+    "prevention": [
+      "Rotate tomatoes away from the same spot for at least two years",
+      "Use disease-free seed; no variety is fully resistant, though some tolerate it",
+      "Shred and bury or hot-compost debris after harvest"
+    ],
+    "sources": [
+      {"title": "University of Maryland Extension: Septoria leaf spot of tomatoes", "url": "https://extension.umd.edu/resource/septoria-leaf-spot-tomatoes"},
+      {"title": "WVU Extension: Septoria leaf spot", "url": "https://extension.wvu.edu/lawn-gardening-pests/plant-disease/fruit-vegetable-diseases/septoria-leaf-spot"},
+      {"title": "Oklahoma State Extension: Septoria leaf spot", "url": "https://extension.okstate.edu/programs/digital-diagnostics/plant-diseases/septoria-leaf-spot"}
+    ]
+  },
+  "Tomato_Spider_mites_Two_spotted_spider_mite": {
+    "crop": "Tomato",
+    "name": "Two-spotted spider mite (pest damage)",
+    "kind": "pest (mite)",
+    "summary": "Tiny sap-sucking mites (Tetranychus urticae) that multiply fast in hot, dry, dusty conditions and in drought-stressed or over-fertilized plants.",
+    "symptoms": [
+      "Fine yellow or white stippling on leaves, often starting on older leaves",
+      "Fine webbing, bronzing and leaf drop in heavy infestations; mites are visible on the undersides"
+    ],
+    "cure_note": "This is a pest, not an infection. It is controllable, and early detection matters most.",
+    "treatment": [
+      "Check leaf undersides with a hand lens; act as soon as mites build up, before webbing appears",
+      "Spray leaves with a strong stream of water, and remove heavily infested leaves",
+      "Predatory mites (for example Phytoseiulus persimilis) are used successfully, especially in greenhouses and tunnels",
+      "If a miticide is needed, use one labelled for tomato, cover the leaf undersides well, and rotate products to slow resistance"
+    ],
+    "prevention": [
+      "Keep weeds down in and around the crop and avoid dust from mowing or traffic near plants",
+      "Water consistently and avoid over-fertilizing",
+      "Scout weekly in hot, dry weather"
+    ],
+    "sources": [
+      {"title": "University of Delaware Extension: Two-spotted spider mite", "url": "https://www.udel.edu/academics/colleges/canr/cooperative-extension/fact-sheets/two-spotted-spider-mite/"},
+      {"title": "University of Maryland Extension: Two-spotted spider mites on vegetables", "url": "https://extension.umd.edu/resource/expect-see-two-spotted-spider-mites-vegetables"},
+      {"title": "NC State Extension: Biological control of spider mites in tomatoes", "url": "https://entomology.ces.ncsu.edu/biological-control-of-spider-mites-in-tomatoes/"}
+    ]
+  },
+  "Tomato__Target_Spot": {
+    "crop": "Tomato",
+    "name": "Target spot",
+    "kind": "fungal disease",
+    "summary": "A fungal disease (Corynespora cassiicola) common in warm, humid regions that is easy to confuse with early blight and bacterial spot.",
+    "symptoms": [
+      "Small dark spots that grow into rings with a target-like pattern, starting on older leaves",
+      "Long thin lesions on stems; pitted spots on fruit"
+    ],
+    "cure_note": "Spots do not heal, but timely fungicide use and sanitation can limit spread.",
+    "treatment": [
+      "Start protectant sprays when the first spots appear, using products containing chlorothalonil, mancozeb or copper where labelled for tomato, and continue until a few weeks before the last harvest",
+      "Remove lower leaves after fruit set and take out heavily infected leaves",
+      "Improve airflow with wider spacing and avoid excess nitrogen"
+    ],
+    "prevention": [
+      "Rotate for about three years before replanting tomatoes on the same land",
+      "Clear and burn or bury crop debris; do not plant new crops beside old infected ones",
+      "No commercial varieties are resistant, so rely on spacing, sanitation and dry foliage"
+    ],
+    "sources": [
+      {"title": "UF/IFAS EDIS PP351: Target spot of tomato in Florida", "url": "https://edis.ifas.ufl.edu/publication/PP351/pdf"},
+      {"title": "Pacific Pests, Pathogens and Weeds: Tomato target spot", "url": "https://apps.lucidcentral.org/pppw_v12/text/web_full/entities/tomato_target_spot_163.htm"},
+      {"title": "World Vegetable Center: Target spot", "url": "https://worldveg.tind.io/record/39590/files/f0164.pdf"}
+    ]
+  },
+  "Tomato__Tomato_YellowLeaf__Curl_Virus": {
+    "crop": "Tomato",
+    "name": "Tomato yellow leaf curl virus (TYLCV)",
+    "kind": "viral disease (spread by whiteflies)",
+    "summary": "A virus transmitted by whiteflies (Bemisia tabaci). Early infection causes the worst yield loss.",
+    "symptoms": [
+      "Small, crumpled leaves that curl upward with yellow edges",
+      "Stunted, bushy plants with flower drop and little fruit"
+    ],
+    "cure_note": "There is no cure for an infected plant. Control means stopping whiteflies and limiting the virus source.",
+    "treatment": [
+      "Remove and destroy infected plants early so whiteflies cannot pick up the virus from them",
+      "Control whiteflies with a labelled insecticide or biopesticide program, rotating modes of action. Treat adults before pruning or tying so they are not disturbed onto healthy plants",
+      "Reflective (metallic) mulch reduces whitefly numbers and virus spread"
+    ],
+    "prevention": [
+      "Plant TYLCV-resistant or tolerant varieties and use virus-free transplants; whitefly control is still needed with resistant types",
+      "Destroy crops promptly after harvest and control weeds that host whiteflies",
+      "Check the undersides of leaves for whiteflies regularly"
+    ],
+    "sources": [
+      {"title": "UF/IFAS EDIS IN1430: Managing Bemisia tabaci and TYLCV in Florida tomato", "url": "https://ask.ifas.ufl.edu/publication/IN1430"},
+      {"title": "UF/IFAS: Management of whiteflies, TYLCV and insecticide resistance", "url": "https://ipm.ifas.ufl.edu/pdfs/Whitefly_Mgmt.pdf"},
+      {"title": "Journal of Economic Entomology: Integrated management of TYLCV and its whitefly vector", "url": "https://bioone.org/journals/journal-of-economic-entomology/volume-112/issue-4/toz051/Integrated-Management-of-Tomato-Yellow-Leaf-Curl-Virus-and-its/10.1093/jee/toz051.full"}
+    ]
+  },
+  "Tomato__Tomato_mosaic_virus": {
+    "crop": "Tomato",
+    "name": "Tomato mosaic virus (ToMV)",
+    "kind": "viral disease (spread by contact)",
+    "summary": "A very stable virus spread mostly by hands, tools, seed and plant-to-plant contact. Mosaic symptoms can resemble other viruses, so lab testing confirms it.",
+    "symptoms": [
+      "Mottled light and dark green or yellow patterns on leaves, sometimes puckered or distorted",
+      "Stunted growth and uneven fruit ripening"
+    ],
+    "cure_note": "There is no cure and no chemical treatment for plant viruses. The only fix is removing infected plants and preventing spread.",
+    "treatment": [
+      "Pull up infected plants including roots and bag or burn them; do not compost",
+      "Wash hands with soap and disinfect tools and stakes after handling plants, and work with healthy plants first",
+      "Avoid using tobacco products around plants and wash hands afterwards",
+      "Weed regularly, as weeds can hold the virus"
+    ],
+    "prevention": [
+      "Plant varieties labelled resistant to ToMV or TMV",
+      "Use certified virus-free seed or treated seed and buy transplants from reputable sources",
+      "Disinfect stakes, ties and equipment between seasons"
+    ],
+    "sources": [
+      {"title": "University of Minnesota Extension: Tomato viruses", "url": "https://extension.umn.edu/disease-management/tomato-viruses"},
+      {"title": "WSU HortSense: Tomato mosaic viruses", "url": "https://hortsense.cahnrs.wsu.edu/fact-sheet/tomato-mosaic-viruses/"},
+      {"title": "University of Minnesota Extension: Managing tomato viruses on farms", "url": "https://www.extension.umn.edu/distribution/horticulture/DG1168.html"}
+    ]
+  },
+  "Tomato_healthy": {
+    "crop": "Tomato",
+    "name": "Healthy leaf",
+    "kind": "healthy",
+    "summary": "No sign of the diseases this model knows about.",
+    "symptoms": [],
+    "cure_note": "Nothing to cure.",
+    "treatment": [
+      "No treatment needed. Scout weekly, including the undersides of leaves"
+    ],
+    "prevention": [
+      "Water at the base in the morning and avoid wetting foliage",
+      "Stake or trellis, space plants and prune the lowest leaves",
+      "Rotate crops, clear debris at season end and choose resistant varieties"
+    ],
+    "sources": []
+  }
+}
